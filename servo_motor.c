@@ -62,7 +62,7 @@ int main(){
 
             if (motorState == 0) {
                 // 특정 각도로 이동 (예: 90도 근처, 펄스 1500us)
-                setServoPulse(1500); 
+                setServoPulse(2300); 
                 LCD_ShowString(LCD_STATUS_X, LCD_STATUS_Y + 20, "Angle: 90 ", BLACK, WHITE);
                 motorState = 1;
             } else {
