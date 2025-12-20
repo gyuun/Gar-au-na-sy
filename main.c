@@ -537,6 +537,14 @@ void GpioInit(void)
 {
     GPIO_InitTypeDef GPIO_InitStructure;
 
+    /* =========================================================
+       [중요] TIM3 Full Remap 해제
+       - Full Remap 상태에서는 TIM3_CH3가 PC8에 출력됨
+       - 이러면 서보 PWM이 모터 핀에 영향을 줌
+       - 반드시 No Remap 상태로 유지해야 TIM3_CH3가 PB0에서만 동작
+       ========================================================= */
+    GPIO_PinRemapConfig(GPIO_FullRemap_TIM3, DISABLE);
+
     /* IR 센서 (PA1) - Analog Input */
     GPIO_InitStructure.GPIO_Pin = IR_SENSOR_PIN;
     GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AIN;
@@ -602,11 +610,15 @@ void GpioInit(void)
        모터 제어 핀 설정 (motor.c 기준)
        - PC6/7: 오른쪽 모터
        - PC8/9: 왼쪽 모터
+       [수정] 핀 설정 직후 즉시 LOW로 초기화하여 모터 정지 보장
        ========================================================= */
     GPIO_InitStructure.GPIO_Pin = MOTOR_ALL_PINS;
     GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
     GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;
     GPIO_Init(GPIOC, &GPIO_InitStructure);
+    
+    /* 모터 핀 즉시 LOW로 설정 (초기화 직후 모터 정지 보장) */
+    GPIO_ResetBits(GPIOC, MOTOR_ALL_PINS);
 }
 
 /* =========================================================
